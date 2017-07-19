@@ -15,6 +15,7 @@ func (f *TodoFilter) Filter(input string) []*Todo {
 	f.Todos = f.filterPrioritized(input)
 	f.Todos = f.filterProjects(input)
 	f.Todos = f.filterContexts(input)
+	f.Todos = f.filterCompleted(input)
 	f.Todos = NewDateFilter(f.Todos).FilterDate(input)
 
 	return f.Todos
@@ -88,6 +89,14 @@ func (f *TodoFilter) filterContexts(input string) []*Todo {
 	return ret
 }
 
+func (f *TodoFilter) filterCompleted(input string) []*Todo {
+	r, _ := regexp.Compile(`l completed`)
+	if r.MatchString(input) {
+		return f.getCompleted(input)
+	}
+	return f.Todos
+}
+
 func (f *TodoFilter) getArchived() []*Todo {
 	var ret []*Todo
 	for _, todo := range f.Todos {
@@ -115,5 +124,24 @@ func (f *TodoFilter) getUnarchived() []*Todo {
 			ret = append(ret, todo)
 		}
 	}
+	return ret
+}
+
+func (f *TodoFilter) getCompleted(input string) []*Todo {
+
+	r, _ := regexp.Compile(`l completed thisweek`)
+	if r.MatchString(input) {
+		f.Todos = NewDateFilter(f.Todos).filterCompletedThisWeek()
+	} else {
+		f.Todos = NewDateFilter(f.Todos).filterCompletedToday()
+	}
+
+	var ret []*Todo
+	for _, todo := range f.Todos {
+		if todo.Completed {
+			ret = append(ret, todo)
+		}
+	}
+
 	return ret
 }

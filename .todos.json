@@ -1,1 +1,89 @@
-[{"id":1,"subject":"support for priorities +feature","projects":["feature"],"contexts":[],"due":"2016-07-08","completed":false,"archived":false},{"id":2,"subject":"fix bug with 'tod' not being recognized +bug","projects":["bug"],"contexts":[],"due":"2016-07-08","completed":false,"archived":false},{"id":3,"subject":"separate into packages/directories +refactor","projects":["refactor"],"contexts":[],"due":"2016-07-08","completed":false,"archived":false},{"id":4,"subject":"+documentation re-record how it works using this https://asciinema.org/","projects":["documentation"],"contexts":[],"due":"","completed":false,"archived":false},{"id":5,"subject":"+slideplayer nice quote support","projects":["slideplayer"],"contexts":[],"due":"","completed":false,"archived":false},{"id":6,"subject":"+slideplayer image filters using css3","projects":["slideplayer"],"contexts":[],"due":"","completed":false,"archived":false},{"id":7,"subject":"+slideplayer syntax highlighting and code blocks","projects":["slideplayer"],"contexts":[],"due":"","completed":false,"archived":false},{"id":8,"subject":"+slideplayer presenter notes","projects":["slideplayer"],"contexts":[],"due":"","completed":false,"archived":false}]
+[
+{
+    "id": 7,
+    "subject": "+slideplayer syntax highlighting and code blocks",
+    "projects": ["slideplayer"],
+    "contexts": [],
+    "due": "",
+    "completed": false,
+    "completedDate": "",
+    "archived": false,
+    "isPriority": false
+},
+{
+    "id": 8,
+    "subject": "+slideplayer presenter notes",
+    "projects": ["slideplayer"],
+    "contexts": [],
+    "due": "",
+    "completed": false,
+    "completedDate": "",
+    "archived": false,
+    "isPriority": false
+},
+{
+    "id": 1,
+    "subject": "support for priorities +feature",
+    "projects": ["feature"],
+    "contexts": [],
+    "due": "2016-07-08",
+    "completed": true,
+    "completedDate": "2017-07-18T23:09:18+01:00",
+    "archived": false,
+    "isPriority": false
+},
+{
+    "id": 2,
+    "subject": "fix bug with 'tod' not being recognized +bug",
+    "projects": ["bug"],
+    "contexts": [],
+    "due": "2016-07-08",
+    "completed": true,
+    "completedDate": "2017-07-10T23:09:33+01:00",
+    "archived": false,
+    "isPriority": false
+},
+{
+    "id": 3,
+    "subject": "separate into packages/directories +refactor",
+    "projects": ["refactor"],
+    "contexts": [],
+    "due": "2016-07-08",
+    "completed": true,
+    "completedDate": "2017-07-10T23:09:35+01:00",
+    "archived": false,
+    "isPriority": false
+},
+{
+    "id": 4,
+    "subject": "+documentation re-record how it works using this https://asciinema.org/",
+    "projects": ["documentation"],
+    "contexts": [],
+    "due": "",
+    "completed": true,
+    "completedDate": "2017-07-19T23:09:37+01:00",
+    "archived": false,
+    "isPriority": false
+},
+{
+    "id": 5,
+    "subject": "+slideplayer nice quote support",
+    "projects": ["slideplayer"],
+    "contexts": [],
+    "due": "",
+    "completed": true,
+    "completedDate": "2017-07-19T23:09:39+01:00",
+    "archived": false,
+    "isPriority": false
+},
+{
+    "id": 6,
+    "subject": "+slideplayer image filters using css3",
+    "projects": ["slideplayer"],
+    "contexts": [],
+    "due": "",
+    "completed": true,
+    "completedDate": "2017-07-19T23:09:40+01:00",
+    "archived": false,
+    "isPriority": false
+}]

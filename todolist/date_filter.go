@@ -3,6 +3,7 @@ package todolist
 import (
 	"regexp"
 	"time"
+	"fmt"
 )
 
 type DateFilter struct {
@@ -14,7 +15,7 @@ func NewDateFilter(todos []*Todo) *DateFilter {
 	return &DateFilter{Todos: todos, Location: time.Now().Location()}
 }
 
-func (f *DateFilter) FilterDate(input string) []*Todo {
+func (f *DateFilter) FilterDate(input string, target string) []*Todo {
 	agendaRegex, _ := regexp.Compile(`agenda.*$`)
 	if agendaRegex.MatchString(input) {
 		return f.filterAgenda(bod(time.Now()))
@@ -117,6 +118,26 @@ func (f *DateFilter) filterThisWeek(pivot time.Time) []*Todo {
 	return ret
 }
 
+func (f *DateFilter) filterCompleteThisWeek() []*Todo {
+	var ret []*Todo
+	pivot := bod(time.Now());
+	begin := bod(f.FindSunday(pivot))
+	end := begin.AddDate(0, 0, 7)
+
+	for _, todo := range f.Todos {
+		if ! todo.Completed || len(todo.CompletedDate) == 0 {
+			continue
+		}
+
+		fmt.Println("- %v\n",todo.Completed)
+		dueTime, _ := time.ParseInLocation("2006-01-02", todo.CompletedDate, f.Location)
+		if (begin.Before(dueTime) || begin.Equal(dueTime)) && end.After(dueTime) {
+			ret = append(ret, todo)
+		}
+	}
+	return ret
+}
+
 func (f *DateFilter) filterNextWeek(pivot time.Time) []*Todo {
 	var ret []*Todo
 
@@ -180,3 +201,40 @@ func (f *DateFilter) FindSunday(pivot time.Time) time.Time {
 	}
 	return pivot
 }
+func (f *DateFilter) filterCompletedThisWeek() []*Todo {
+	var ret []*Todo
+	pivot := bod(time.Now())
+	for _, todo := range f.Todos {
+		if todo.CompletedDate == "" || !todo.Completed {
+			continue
+		}
+		begin := bod(f.FindSunday(pivot))
+		end := begin.AddDate(0, 0, +7)
+
+		completeTime, _ := time.ParseInLocation(ISO8601_TIMESTAMP_FORMAT, todo.CompletedDate, f.Location)
+		if (begin.Before(completeTime) || begin.Equal(completeTime)) && end.After(completeTime) {
+			ret = append(ret, todo)
+		}
+	}
+
+	return ret
+}
+
+func (f *DateFilter) filterCompletedToday() []*Todo {
+	var ret []*Todo
+	pivot := bod(time.Now())
+	for _, todo := range f.Todos {
+		if todo.CompletedDate == "" || !todo.Completed {
+			continue
+		}
+		begin := bod(pivot)
+		end := bod(begin.AddDate(0, 0, +1))
+		completeTime, _ := time.ParseInLocation(ISO8601_TIMESTAMP_FORMAT, todo.CompletedDate, f.Location)
+		if (begin.Before(completeTime) || begin.Equal(completeTime)) && end.After(completeTime) {
+			ret = append(ret, todo)
+		}
+	}
+
+	return ret
+}
+
