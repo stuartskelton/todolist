@@ -1,26 +1,36 @@
-package main
+package cmd
 
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/fatih/color"
-	"github.com/gammons/todolist/todolist"
-	"github.com/skratchdot/open-golang/open"
+	"github.com/spf13/cobra"
 )
 
 const (
 	VERSION = "0.6"
 )
 
-func main() {
-	if len(os.Args) <= 1 {
+var RootCmdBLUB string = fmt.Sprintf("todo v%s, a simple, command line based, GTD-style todo manager\n", VERSION)
+
+// RootCmd represents the base command when called without any subcommands
+var RootCmd = &cobra.Command{
+	Use:   "todolist",
+	Short: RootCmdBLUB,
+	Long:  RootCmdBLUB,
+	Run: func(cmd *cobra.Command, args []string) {
 		usage()
-		os.Exit(0)
+	},
+}
+
+// Execute adds all child commands to the root command sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	if err := RootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
 	}
-	input := strings.Join(os.Args[1:], " ")
-	routeInput(os.Args[1], input)
 }
 
 func usage() {
@@ -30,7 +40,7 @@ func usage() {
 
 	blueBold := blue.Add(color.Bold)
 
-	fmt.Printf("todo v%s, a simple, command line based, GTD-style todo manager\n", VERSION)
+	fmt.Print(RootCmdBLUB)
 
 	blueBold.Println("\nAdding todos")
 	fmt.Println("  the 'a' command adds todos.")
@@ -127,47 +137,4 @@ func usage() {
 	blueBold.Println("\nGarbage Collection")
 	yellow.Println("\ttodo gc")
 	fmt.Println("\tDeletes all archived todos.\n")
-}
-
-func routeInput(command string, input string) {
-	app := todolist.NewApp()
-	switch command {
-	case "l", "list", "agenda":
-		app.ListTodos(input)
-	case "a", "add":
-		app.AddTodo(input)
-	case "d", "delete":
-		app.DeleteTodo(input)
-	case "c", "complete":
-		app.CompleteTodo(input)
-	case "uc", "uncomplete":
-		app.UncompleteTodo(input)
-	case "ar", "archive":
-		app.ArchiveTodo(input)
-	case "uar", "unarchive":
-		app.UnarchiveTodo(input)
-	case "ac":
-		app.ArchiveCompleted()
-	case "e", "edit":
-		app.EditTodo(input)
-	case "ex", "expand":
-		app.ExpandTodo(input)
-	case "gc":
-		app.GarbageCollect()
-	case "p", "prioritize":
-		app.PrioritizeTodo(input)
-	case "up", "unprioritize":
-		app.UnprioritizeTodo(input)
-	case "init":
-		app.InitializeRepo()
-	case "web":
-		if err := app.Load(); err != nil {
-			os.Exit(1)
-		} else {
-			web := todolist.NewWebapp()
-			fmt.Println("Now serving todolist web.\nHead to http://localhost:7890 to see your todo list!")
-			open.Start("http://localhost:7890")
-			web.Run()
-		}
-	}
 }

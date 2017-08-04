@@ -29,7 +29,7 @@ func (p *Parser) ParseNewTodo(input string) *Todo {
 }
 
 func (p *Parser) ParseEditTodo(todo *Todo, input string) bool {
-	r := regexp.MustCompile(`(\w+)\s+(\d+)(\s+(.*))?`)
+	r := regexp.MustCompile(`(\d+)(\s+(.*))?`)
 	matches := r.FindStringSubmatch(input)
 	if len(matches) < 3 {
 		fmt.Println("Could not match command or id")
@@ -59,7 +59,7 @@ func (p *Parser) Subject(input string) string {
 }
 
 func (p *Parser) ExpandProject(input string) string {
-	r, _ := regexp.Compile(`(ex|expand) +\d+ +\+[\p{L}\d_-]+:`)
+	r, _ := regexp.Compile(`\d+\s+\+[\p{L}\d_-]+:`)
 	pattern := r.FindString(input)
 	if len(pattern) == 0 {
 		return ""
