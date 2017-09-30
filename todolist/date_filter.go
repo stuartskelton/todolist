@@ -8,10 +8,15 @@ import (
 type DateFilter struct {
 	Todos    []*Todo
 	Location *time.Location
+	Now      time.Time
 }
 
 func NewDateFilter(todos []*Todo) *DateFilter {
-	return &DateFilter{Todos: todos, Location: time.Now().Location()}
+	return &DateFilter{
+		Todos:    todos,
+		Location: time.Now().Location(),
+		Now:      time.Now(),
+	}
 }
 
 func filterOnDue(todo *Todo) string {
@@ -37,19 +42,19 @@ func (f *DateFilter) FilterDate(input string) []*Todo {
 	case match == "due tom" || match == "due tomorrow":
 		return f.filterDueTomorrow(bod(time.Now()))
 	case match == "due sun" || match == "due sunday":
-		return f.filterDay(bod(time.Now()), time.Sunday)
+		return f.filterDueDay(bod(time.Now()), time.Sunday)
 	case match == "due mon" || match == "due monday":
-		return f.filterDay(bod(time.Now()), time.Monday)
+		return f.filterDueDay(bod(time.Now()), time.Monday)
 	case match == "due tue" || match == "due tuesday":
-		return f.filterDay(bod(time.Now()), time.Tuesday)
+		return f.filterDueDay(bod(time.Now()), time.Tuesday)
 	case match == "due wed" || match == "due wednesday":
-		return f.filterDay(bod(time.Now()), time.Wednesday)
+		return f.filterDueDay(bod(time.Now()), time.Wednesday)
 	case match == "due thu" || match == "due thursday":
-		return f.filterDay(bod(time.Now()), time.Thursday)
+		return f.filterDueDay(bod(time.Now()), time.Thursday)
 	case match == "due fri" || match == "due friday":
-		return f.filterDay(bod(time.Now()), time.Friday)
+		return f.filterDueDay(bod(time.Now()), time.Friday)
 	case match == "due sat" || match == "due saturday":
-		return f.filterDay(bod(time.Now()), time.Saturday)
+		return f.filterDueDay(bod(time.Now()), time.Saturday)
 	case match == "due this week":
 		return f.filterThisWeek(bod(time.Now()))
 	case match == "due next week":
@@ -107,14 +112,17 @@ func (f *DateFilter) filterDueTomorrow(pivot time.Time) []*Todo {
 	return f.filterToExactDate(pivot, filterOnDue)
 }
 
-func (f *DateFilter) filterCompletedToday(pivot time.Time) []*Todo {
-	return f.filterToExactDate(pivot, filterOnCompletedDate)
+func (f *DateFilter) filterDueDay(pivot time.Time, day time.Weekday) []*Todo {
+
+	pivot = f.FindSunday(pivot).AddDate(0, 0, int(day))
+	if int(f.Now.Weekday()) > int(day) {
+		pivot = pivot.AddDate(0, 0, 7)
+	}
+	return f.filterToExactDate(pivot, filterOnDue)
 }
 
-func (f *DateFilter) filterDay(pivot time.Time, day time.Weekday) []*Todo {
-	thisWeek := NewDateFilter(f.filterThisWeek(pivot))
-	pivot = f.FindSunday(pivot).AddDate(0, 0, int(day))
-	return thisWeek.filterToExactDate(pivot, filterOnDue)
+func (f *DateFilter) filterCompletedToday(pivot time.Time) []*Todo {
+	return f.filterToExactDate(pivot, filterOnCompletedDate)
 }
 
 func (f *DateFilter) filterBetweenDatesInclusive(begin, end time.Time, filterOn func(*Todo) string) []*Todo {
