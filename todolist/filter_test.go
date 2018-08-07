@@ -1,18 +1,16 @@
 package todolist
 
 import (
-	"testing"
-
+	// "fmt"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestFilterArchived(t *testing.T) {
 	assert := assert.New(t)
-	store := &FileStore{FileLocation: "todos.json"}
-	list := &TodoList{}
-	todos, _ := store.Load()
-	list.Load(todos)
-	filter := NewFilter(list.Todos())
+	list := SetUpMemoryTodoList()
+	todos, _ := list.Store.FetchAll()
+	filter := NewFilter(todos)
 	archived := filter.filterArchived("l archived")
 	assert.Equal(1, len(archived))
 	assert.Equal(true, archived[0].Archived)
@@ -20,11 +18,9 @@ func TestFilterArchived(t *testing.T) {
 
 func TestFilterUnarchivedByDefault(t *testing.T) {
 	assert := assert.New(t)
-	store := &FileStore{FileLocation: "todos.json"}
-	list := &TodoList{}
-	todos, _ := store.Load()
-	list.Load(todos)
-	filter := NewFilter(list.Todos())
+	list := SetUpMemoryTodoList()
+	todos, _ := list.Store.FetchAll()
+	filter := NewFilter(todos)
 	unarchived := filter.filterArchived("l")
 	assert.Equal(1, len(unarchived))
 	assert.Equal(false, unarchived[0].Archived)
@@ -34,7 +30,7 @@ func TestFilterShowArchivedWhenWeAskForCompleted(t *testing.T) {
 	assert := assert.New(t)
 	store := &FileStore{FileLocation: "todos.json"}
 	list := &TodoList{}
-	todos, _ := store.Load()
+	todos, _ := store.FetchAll()
 	list.Load(todos)
 	filter := NewFilter(list.Todos())
 	unarchived := filter.filterArchived("completed")
@@ -47,7 +43,7 @@ func TestGetArchived(t *testing.T) {
 	assert := assert.New(t)
 	store := &FileStore{FileLocation: "todos.json"}
 	list := &TodoList{}
-	todos, _ := store.Load()
+	todos, _ := store.FetchAll()
 	list.Load(todos)
 	filter := NewFilter(list.Todos())
 	archived := filter.getArchived()
@@ -59,7 +55,7 @@ func TestGetUnarchived(t *testing.T) {
 	assert := assert.New(t)
 	store := &FileStore{FileLocation: "todos.json"}
 	list := &TodoList{}
-	todos, _ := store.Load()
+	todos, _ := store.FetchAll()
 	list.Load(todos)
 	filter := NewFilter(list.Todos())
 	unarchived := filter.getUnarchived()

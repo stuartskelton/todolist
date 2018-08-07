@@ -8,22 +8,20 @@ import (
 )
 
 type App struct {
-	TodoStore Store
-	Printer   Printer
-	TodoList  *TodoList
+	Printer  Printer
+	TodoList *TodoList
 }
 
 func NewApp() *App {
 	app := &App{
-		TodoList:  &TodoList{},
-		Printer:   NewScreenPrinter(),
-		TodoStore: NewFileStore(),
+		TodoList: NewTodoList(NewFileStore()),
+		Printer:  NewScreenPrinter(),
 	}
 	return app
 }
 
 func (a *App) InitializeRepo() {
-	a.TodoStore.Initialize()
+	a.TodoList.Store.Initialize()
 }
 
 func (a *App) AddTodo(input string) {
@@ -35,10 +33,9 @@ func (a *App) AddTodo(input string) {
 		return
 	}
 
-	id := a.TodoList.NextId()
 	a.TodoList.Add(todo)
 	a.Save()
-	fmt.Printf("Todo %d added.\n", id)
+	fmt.Printf("Todo %d added.\n", todo.Id)
 }
 
 // AddDoneTodo Adds a todo and immediately completed it.
@@ -54,11 +51,10 @@ func (a *App) AddDoneTodo(input string) {
 		return
 	}
 
-	id := a.TodoList.NextId()
 	a.TodoList.Add(todo)
-	a.TodoList.Complete(id)
+	a.TodoList.Complete(todo.Id)
 	a.Save()
-	fmt.Printf("Completed Todo %d added.\n", id)
+	fmt.Printf("Completed Todo %d added.\n", todo.Id)
 }
 
 func (a *App) DeleteTodo(input string) {
@@ -122,7 +118,7 @@ func (a *App) EditTodo(input string) {
 	if id == -1 {
 		return
 	}
-	todo := a.TodoList.FindById(id)
+	todo, _ := a.TodoList.Store.FetchById(id)
 	if todo == nil {
 		fmt.Println("No such id.")
 		return
@@ -168,7 +164,7 @@ func (a *App) HandleNotes(input string) {
 	if id == -1 {
 		return
 	}
-	todo := a.TodoList.FindById(id)
+	todo, _ := a.TodoList.Store.FetchById(id)
 	if todo == nil {
 		fmt.Println("No such id.")
 		return
@@ -302,14 +298,13 @@ func (a *App) GarbageCollect() {
 }
 
 func (a *App) Load() error {
-	todos, err := a.TodoStore.Load()
+	err := a.TodoList.Store.Load()
 	if err != nil {
 		return err
 	}
-	a.TodoList.Load(todos)
 	return nil
 }
 
 func (a *App) Save() {
-	a.TodoStore.Save(a.TodoList.Data)
+	a.TodoList.Store.Save()
 }

@@ -1,20 +1,16 @@
 package todolist
 
 import (
-	"testing"
-
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestFileStore(t *testing.T) {
 	assert := assert.New(t)
-	store := &FileStore{FileLocation: "todos.json"}
-	todos, _ := store.Load()
-	assert.Equal(todos[0].Subject, "this is the first subject", "")
-}
-
-func TestSave(t *testing.T) {
-	store := &FileStore{FileLocation: "todos.json"}
-	todos, _ := store.Load()
-	store.Save(todos)
+	store := NewFileStoreWithLocation("todos.json")
+	fmt.Printf("%v+", store)
+	assert.Equal(1, 1)
+	// todo, _ := store.FetchById(1)
+	// assert.Equal(todo.Subject, "this is the first subject", "")
 }

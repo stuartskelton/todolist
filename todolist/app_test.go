@@ -11,12 +11,13 @@ import (
 
 func TestAddTodo(t *testing.T) {
 	assert := assert.New(t)
-	app := &App{TodoList: &TodoList{}, TodoStore: &MemoryStore{}}
+	TodoStore := &MemoryStore{}
+	app := &App{TodoList: &TodoList{Store: TodoStore}}
 	year := strconv.Itoa(time.Now().Year())
 
 	app.AddTodo("a do some stuff due may 23")
 
-	todo := app.TodoList.FindById(1)
+	todo, _ := app.TodoList.Store.FetchById(1)
 	assert.Equal("do some stuff", todo.Subject)
 	assert.Equal(fmt.Sprintf("%s-05-23", year), todo.Due)
 	assert.Equal(false, todo.Completed)
@@ -29,11 +30,12 @@ func TestAddTodo(t *testing.T) {
 
 func TestAddDoneTodo(t *testing.T) {
 	assert := assert.New(t)
-	app := &App{TodoList: &TodoList{}, TodoStore: &MemoryStore{}}
+	TodoStore := &MemoryStore{}
+	app := &App{TodoList: &TodoList{Store: TodoStore}}
 
 	app.AddDoneTodo("Groked how to do done todos @pop")
 
-	todo := app.TodoList.FindById(1)
+	todo, _ := app.TodoList.Store.FetchById(1)
 	assert.Equal("Groked how to do done todos @pop", todo.Subject)
 	assert.Equal(true, todo.Completed)
 	assert.Equal(false, todo.Archived)
@@ -45,12 +47,13 @@ func TestAddDoneTodo(t *testing.T) {
 
 func TestAddTodoWithEuropeanDates(t *testing.T) {
 	assert := assert.New(t)
-	app := &App{TodoList: &TodoList{}, TodoStore: &MemoryStore{}}
+	TodoStore := &MemoryStore{}
+	app := &App{TodoList: &TodoList{Store: TodoStore}}
 	year := strconv.Itoa(time.Now().Year())
 
 	app.AddTodo("a do some stuff due 23 may")
 
-	todo := app.TodoList.FindById(1)
+	todo, _ := app.TodoList.Store.FetchById(1)
 	assert.Equal("do some stuff", todo.Subject)
 	assert.Equal(fmt.Sprintf("%s-05-23", year), todo.Due)
 	assert.Equal(false, todo.Completed)
@@ -63,19 +66,21 @@ func TestAddTodoWithEuropeanDates(t *testing.T) {
 
 func TestAddEmptyTodo(t *testing.T) {
 	assert := assert.New(t)
-	app := &App{TodoList: &TodoList{}, TodoStore: &MemoryStore{}}
+	TodoStore := &MemoryStore{}
+	app := &App{TodoList: &TodoList{Store: TodoStore}}
 
 	app.AddTodo("a")
 	app.AddTodo("a      ")
 	app.AddTodo("a\t\t\t\t")
 	app.AddTodo("a\t \t  \t   \t")
-
-	assert.Equal(len(app.TodoList.Data), 0)
+	todos, _ := app.TodoList.Store.FetchAll()
+	assert.Equal(len(todos), 0)
 }
 
 func TestListbyProject(t *testing.T) {
 	assert := assert.New(t)
-	app := &App{TodoList: &TodoList{}, TodoStore: &MemoryStore{}}
+	TodoStore := &MemoryStore{}
+	app := &App{TodoList: &TodoList{Store: TodoStore}}
 	app.Load()
 
 	// create three todos w/wo a project
@@ -103,7 +108,8 @@ func TestListbyProject(t *testing.T) {
 
 func TestListbyContext(t *testing.T) {
 	assert := assert.New(t)
-	app := &App{TodoList: &TodoList{}, TodoStore: &MemoryStore{}}
+	TodoStore := &MemoryStore{}
+	app := &App{TodoList: &TodoList{Store: TodoStore}}
 	app.Load()
 
 	// create three todos w/wo a context
@@ -140,7 +146,8 @@ func TestListbyContext(t *testing.T) {
 
 func TestGetId(t *testing.T) {
 	assert := assert.New(t)
-	app := &App{TodoList: &TodoList{}, TodoStore: &MemoryStore{}}
+	TodoStore := &MemoryStore{}
+	app := &App{TodoList: &TodoList{Store: TodoStore}}
 	// not a valid id
 	assert.Equal(-1, app.getId("p"))
 	// a single digit id
@@ -151,7 +158,8 @@ func TestGetId(t *testing.T) {
 
 func TestGetIds(t *testing.T) {
 	assert := assert.New(t)
-	app := &App{TodoList: &TodoList{}, TodoStore: &MemoryStore{}}
+	TodoStore := &MemoryStore{}
+	app := &App{TodoList: &TodoList{Store: TodoStore}}
 	// no valid id here
 	assert.Equal(0, len(app.getIds("p")))
 	// one valid value here

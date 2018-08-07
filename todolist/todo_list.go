@@ -1,116 +1,98 @@
 package todolist
 
-import "sort"
+import (
+	"sort"
+)
 
 type TodoList struct {
-	Data []*Todo
+	Store Store
+}
+
+//NewTodoList Create a new instance of todolist with the provided store.
+func NewTodoList(storage Store) *TodoList {
+	return &TodoList{Store: storage}
 }
 
 func (t *TodoList) Load(todos []*Todo) {
-	t.Data = todos
+	t.Store.Load()
+}
+
+func (t *TodoList) FindById(id int) *Todo {
+	todo, err := t.Store.FetchById(id)
+	if err != nil {
+		panic(err)
+	}
+	return todo
 }
 
 func (t *TodoList) Add(todo *Todo) {
-	todo.Id = t.NextId()
-	t.Data = append(t.Data, todo)
+	t.Store.Add(todo)
 }
 
 func (t *TodoList) Delete(ids ...int) {
 	for _, id := range ids {
-		todo := t.FindById(id)
-		if todo == nil {
-			continue
-		}
-		i := -1
-		for index, todo := range t.Data {
-			if todo.Id == id {
-				i = index
-			}
-		}
-
-		t.Data = append(t.Data[:i], t.Data[i+1:]...)
+		t.Store.Delete(id)
 	}
 }
 
 func (t *TodoList) Complete(ids ...int) {
 	for _, id := range ids {
-		todo := t.FindById(id)
+		todo, _ := t.Store.FetchById(id)
 		if todo == nil {
 			continue
 		}
 		todo.Complete()
-		t.Delete(id)
-		t.Data = append(t.Data, todo)
 	}
 }
 
 func (t *TodoList) Uncomplete(ids ...int) {
 	for _, id := range ids {
-		todo := t.FindById(id)
+		todo, _ := t.Store.FetchById(id)
 		if todo == nil {
 			continue
 		}
 		todo.Uncomplete()
-		t.Delete(id)
-		t.Data = append(t.Data, todo)
 	}
 }
 
 func (t *TodoList) Archive(ids ...int) {
 	for _, id := range ids {
-		todo := t.FindById(id)
+		todo, _ := t.Store.FetchById(id)
 		if todo == nil {
 			continue
 		}
 		todo.Archive()
-		t.Delete(id)
-		t.Data = append(t.Data, todo)
 	}
 }
 
 func (t *TodoList) Unarchive(ids ...int) {
 	for _, id := range ids {
-		todo := t.FindById(id)
+		todo, _ := t.Store.FetchById(id)
 		if todo == nil {
 			continue
 		}
 		todo.Unarchive()
-		t.Delete(id)
-		t.Data = append(t.Data, todo)
 	}
 }
 
 func (t *TodoList) Prioritize(ids ...int) {
 	for _, id := range ids {
-		todo := t.FindById(id)
+		todo, _ := t.Store.FetchById(id)
 		if todo == nil {
 			continue
 		}
 		todo.Prioritize()
-		t.Delete(id)
-		t.Data = append(t.Data, todo)
 	}
 }
 
 func (t *TodoList) Unprioritize(ids ...int) {
 	for _, id := range ids {
-		todo := t.FindById(id)
+		todo, _ := t.Store.FetchById(id)
 		if todo == nil {
 			continue
 		}
 		todo.Unprioritize()
-		t.Delete(id)
-		t.Data = append(t.Data, todo)
 	}
-}
-
-func (t *TodoList) IndexOf(todoToFind *Todo) int {
-	for i, todo := range t.Data {
-		if todo.Id == todoToFind.Id {
-			return i
-		}
-	}
-	return -1
 }
 
 type ByDate []*Todo
@@ -124,50 +106,15 @@ func (a ByDate) Less(i, j int) bool {
 }
 
 func (t *TodoList) Todos() []*Todo {
-	sort.Sort(ByDate(t.Data))
-	return t.Data
-}
-
-func (t *TodoList) MaxId() int {
-	maxId := 0
-	for _, todo := range t.Data {
-		if todo.Id > maxId {
-			maxId = todo.Id
-		}
-	}
-	return maxId
-}
-
-func (t *TodoList) NextId() int {
-	var found bool
-	maxID := t.MaxId()
-	for i := 1; i <= maxID; i++ {
-		found = false
-		for _, todo := range t.Data {
-			if todo.Id == i {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return i
-		}
-	}
-	return maxID + 1
-}
-
-func (t *TodoList) FindById(id int) *Todo {
-	for _, todo := range t.Data {
-		if todo.Id == id {
-			return todo
-		}
-	}
-	return nil
+	todos, _ := t.Store.FetchAll()
+	sort.Sort(ByDate(todos))
+	return todos
 }
 
 func (t *TodoList) GarbageCollect() {
 	var toDelete []*Todo
-	for _, todo := range t.Data {
+	todos, _ := t.Store.FetchAll()
+	for _, todo := range todos {
 		if todo.Archived {
 			toDelete = append(toDelete, todo)
 		}

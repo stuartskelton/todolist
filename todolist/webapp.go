@@ -90,7 +90,8 @@ func GetTodos(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	app := NewApp()
 	app.Load()
-	json, _ := json.Marshal(app.TodoList.Data)
+	todos, _ := app.TodoList.Store.FetchAll()
+	json, _ := json.Marshal(todos)
 	fmt.Fprintf(w, string(json))
 }
 func TodoOptions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -102,6 +103,7 @@ func TodoOptions(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func SaveTodos(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Access-Control-Allow-Headers", "*")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	fmt.Printf("%v+", r.Body)
 	decoder := json.NewDecoder(r.Body)
 	var todos []*Todo
 	err := decoder.Decode(&todos)
@@ -109,6 +111,6 @@ func SaveTodos(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		log.Fatal("encountered an error parsing json, ", err)
 	}
 	app := NewApp()
-	app.TodoStore.Load()
-	app.TodoStore.Save(todos)
+	app.TodoList.Store.Load()
+	app.TodoList.Store.Save()
 }
